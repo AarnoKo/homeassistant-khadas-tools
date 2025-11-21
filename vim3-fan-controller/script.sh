@@ -16,6 +16,15 @@ interval=$(bashio::config 'interval')
 tolerance=$(bashio::config 'tolerance')
 last_fan_speed=0
 
+# Validate thresholds are strictly ascending
+if [ "$setpoint_low" -ge "$setpoint_medium" ] || [ "$setpoint_medium" -ge "$setpoint_high" ]; then
+  bashio::log.warning "Thresholds should be strictly ascending (threshold_1 < threshold_2 < threshold_3)."
+fi
+
+# Initialize fan to OFF explicitly (speed 0) regardless of previous state
+bashio::log.info "Initializing fan to OFF (speed 0)"
+$fan_control_command 0
+
 # Log the configuration
 bashio::log.info "===================== Configuration ====================="
 bashio::log.info "Threshold 1: $setpoint_low"
